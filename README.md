@@ -442,7 +442,7 @@ public class MyDiContainer : DiContainer
 
     public override void Provide()
     {
-        AddByType<IEngine,DieselEngine>(InjectionType.AsFactory, "disel");
+        AddByType<IEngine, DieselEngine>(InjectionType.AsFactory, "disel");
         AddByType<IEngine, PetrolEngine>(InjectionType.AsFactory, "petrol");
         AddByType<IWheel, TigarWheel>(InjectionType.AsFactory, "tiger");
         AddByType<IWheel, WinteraWheel>(InjectionType.AsFactory, "wintera");
@@ -473,3 +473,100 @@ public class Car
 }
 ```
 `Param` is attribute which you can use to specify which implementation to create. You can add `Param` for all parameters from contructor or for some of them.
+
+### Let's create situation much more complex.
+What if we have mutiple implementation of cars which can inject multiple implementations of wheels and engings.
+Let's create interace for car:
+``` c#
+public interface ICar
+{
+    void StartCar();
+}
+```
+
+And implement regular `Car` with that interface:
+``` c#
+public class Car : ICar
+{
+    private IEngine engine;
+    private IWheel wheel;
+
+    [Inject]
+    public Car([Param("petrol")] IEngine engine, [Param("wintera")] IWheel wheel)
+    {
+        this.engine = engine;
+        this.wheel = wheel;
+    }
+
+
+    public void StartCar()
+    {
+        engine.startEngine();
+        wheel.Controll();
+    }
+}
+```
+And also create one more car implementation:
+``` c#
+public class FastCar : ICar
+{
+    private IEngine engine;
+    private IWheel wheel;
+
+    [Inject]
+    public FastCar([Param("disel")] IEngine engine, [Param("tiger")] IWheel wheel)
+    {
+        this.engine = engine;
+        this.wheel = wheel;
+    }
+
+
+    public void StartCar()
+    {
+        engine.startEngine();
+        wheel.Controll();
+    }
+}
+```
+
+As you can see, `Car` requires `petrol` engine and `wintera` wheels. And `FastCar` requires `disel` engine and `tiger` wheels.
+
+So now we just need to register this two implementations in DI container:
+``` c#
+public class MyDiContainer : DiContainer
+{
+
+    public override void Provide()
+    {
+        AddByType<IEngine, DieselEngine>(InjectionType.AsFactory, "disel");
+        AddByType<IEngine, PetrolEngine>(InjectionType.AsFactory, "petrol");
+        AddByType<IWheel, TigarWheel>(InjectionType.AsFactory, "tiger");
+        AddByType<IWheel, WinteraWheel>(InjectionType.AsFactory, "wintera");
+        AddByType<ICar, Car>(InjectionType.AsFactory,"regularCar"); // add for regular car
+        AddByType<ICar, FastCar>(InjectionType.AsFactory, "fastCar"); // add for fast car
+    }
+}
+```
+And now use it:
+``` c#
+public class GameManager : MonoBehaviour
+{
+    
+    [Inject("regularCar")] // specify for regular
+    public ICar car;
+
+    [Inject("fastCar")] // specify for fast
+    public ICar car2;
+
+    void Start()
+    {
+        // Register class for binding!
+        DiContainer.Instance.Bind(this);
+
+        car.StartCar();
+        car2.StartCar();
+    }
+   
+}
+
+```
