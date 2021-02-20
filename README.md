@@ -320,3 +320,94 @@ public class GameManager : MonoBehaviour
    
 }
 ```
+### 6. Contructor injection
+Contructor injection is very important and in practice very usefull(or say "most wanted").
+Use case for contructor injection is when you want to inject class which also requrire some injections.
+For example let's create few classes and interfaces:
+``` c#
+public interface IEngine
+{
+    void startEngine();
+}
+```
+and implementation of that interface:
+``` c#
+public class DieselEngine : IEngine
+{
+    public void startEngine()
+    {
+        Debug.Log("Start Diesel engine!");
+    }
+}
+```
+
+Also:
+``` c#
+public interface IWheel
+{
+    void Controll();
+}
+```
+And implementation:
+``` c#
+public class TigarWheel : IWheel
+{
+    public void Controll()
+    {
+        Debug.Log("Tiger wheels are OK!");
+    }
+}
+```
+Let's say we have Car class and that class requreies injection of Iwheel specific implemention and IEngine.
+For that case we can use constructor injection:
+``` c#
+public class Car
+{
+    private IEngine engine;
+    private IWheel wheel;
+
+    [Inject]
+    public Car(IEngine engine, IWheel wheel) // Constructor injection
+    {
+        this.engine = engine;
+        this.wheel = wheel;
+    }
+
+
+    public void StartCar()
+    {
+        engine.startEngine();
+        wheel.Controll();
+    }
+}
+
+```
+Now you just need to sat DI which implementation to use and DI will make rest of the job for you:
+``` c#
+public class MyDiContainer : DiContainer
+{
+    public override void Provide()
+    {
+        AddByType<IEngine,DieselEngine>(InjectionType.AsFactory);
+        AddByType<IWheel, TigarWheel>(InjectionType.AsFactory);
+        AddByType<Car>(InjectionType.AsFactory);
+    }
+}
+```
+So now you can inject car:
+``` c#
+public class GameManager : MonoBehaviour
+{
+    [Inject]
+    public Car car;
+
+    void Start()
+    {
+        // Register class for binding!
+        DiContainer.Instance.Bind(this);
+
+        car.StartCar();
+    }
+   
+}
+```
