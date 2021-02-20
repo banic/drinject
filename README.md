@@ -413,3 +413,63 @@ public class GameManager : MonoBehaviour
    
 }
 ```
+### Let's create situation more complex.
+Create one more implementation of IWheel and IEnigne
+``` c#
+public class WinteraWheel : IWheel
+{
+    public void Controll()
+    {
+        Debug.Log("Wintera wheels are OK!");
+    }
+}
+```
+And
+``` c#
+public class PetrolEngine : IEngine
+{
+    public void startEngine()
+    {
+        Debug.Log("Start Petrol engine!");
+    }
+}
+```
+Now we have `DieselEngine` and `PetrolEngine` engines and `TigarWheel` and `WinteraWheel` wheels.
+So if we want to use them all, wee need to say DI how to create it. And because we have multiple implementations, we must classify it by name:
+``` c#
+public class MyDiContainer : DiContainer
+{
+
+    public override void Provide()
+    {
+        AddByType<IEngine,DieselEngine>(InjectionType.AsFactory, "disel");
+        AddByType<IEngine, PetrolEngine>(InjectionType.AsFactory, "petrol");
+        AddByType<IWheel, TigarWheel>(InjectionType.AsFactory, "tiger");
+        AddByType<IWheel, WinteraWheel>(InjectionType.AsFactory, "wintera");
+        AddByType<Car>(InjectionType.AsFactory);
+    }
+}
+```
+And now, we must to say Car which to use:
+``` c#
+public class Car
+{
+    private IEngine engine;
+    private IWheel wheel;
+
+    [Inject]
+    public Car([Param("disel")] IEngine engine, [Param("wintera")] IWheel wheel) // Classification with params
+    {
+        this.engine = engine;
+        this.wheel = wheel;
+    }
+
+
+    public void StartCar()
+    {
+        engine.startEngine();
+        wheel.Controll();
+    }
+}
+```
+`Param` is attribute which you can use to specify which implementation to create. You can add `Param` for all parameters from contructor or for some of them.
