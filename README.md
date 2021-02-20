@@ -62,6 +62,8 @@ public class GameManager : MonoBehaviour
 `Inject` attribute tell DI to provide class and `DiContainer.Instance.Bind(this);` tells DI container to instantete all required things from DI.
 After that you can access to the object of injected class, like `simpleClass.Print();`.
 
+Last step is to add empty game object into the sceen and to attach your container implementation (in this case `MyDiContainer`) to it.
+
 ### You have several options to provide object
 
 ### 1. From Instance
