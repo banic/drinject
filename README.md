@@ -5,7 +5,7 @@
 ## How to setup?
 
 ##### 1. Create custom class and extend DiContainer
-```
+``` c#
 public class MyDiContainer : DiContainer
 {
 
@@ -19,7 +19,7 @@ public class MyDiContainer : DiContainer
 In this class you will provide every class which you want to be injected.
 
 For example, let's create class for testing ->
-```
+``` c#
 public class SimpleClass
 {
     public void Print()
@@ -30,7 +30,7 @@ public class SimpleClass
 ```
 
 ##### 2. To use class for Injection, you first must to tell DI container how to use it
-```
+``` c#
 public class MyDiContainer : DiContainer
 {
 
@@ -43,7 +43,7 @@ public class MyDiContainer : DiContainer
 `AddFromInstance` is just one of posible solution to provide wanted class into DI (more options will be described latter)
 
 ##### 3. To use that class directly from DI, set->
-```
+``` c#
 public class GameManager : MonoBehaviour
 {
     [Inject]
@@ -68,7 +68,7 @@ After that you can access to the object of injected class, like `simpleClass.Pri
 Like you see abowe, if you add iy by instance, all other classes which access to the SimpleClass injeceted by instance, will actually access to the same object.
 
 If you add one more inject to the GameManager required SimpleClass, they will receive the same object:
-```
+``` c#
 public class GameManager : MonoBehaviour
 {
     [Inject]
@@ -91,7 +91,7 @@ public class GameManager : MonoBehaviour
 
 To have different object, you must use classification by name:
 
-```
+``` c#
 public class MyDiContainer : DiContainer
 {
 
@@ -104,7 +104,7 @@ public class MyDiContainer : DiContainer
 
 ```
 And than to tell your class which to use:
-```
+``` c#
 public class GameManager : MonoBehaviour
 {
     [Inject("simple1")] // ADD HERE FOR simple1
@@ -126,7 +126,7 @@ public class GameManager : MonoBehaviour
 ### 2. Add by type (factory)
 Sometims you want everytime new instance when you required it by inject.
 In that case you must to use injection by type and tell DI to create every time new instance:
-```
+``` c#
 public class MyDiContainer : DiContainer
 {
 
@@ -138,7 +138,7 @@ public class MyDiContainer : DiContainer
 ```
 `AddByType` will tell DI to create that type of class by himself and `InjectionType.AsFactory` will tell to create every time new instace.
 Example:
-```
+``` c#
 public class GameManager : MonoBehaviour
 {
     [Inject]
@@ -160,14 +160,14 @@ public class GameManager : MonoBehaviour
 ```
 ### 3. Interface creation by type
 If we have interaface 
-```
+``` c#
 public interface ISimpleClass
 {
     void Print();
 }
 ```
 And change simple class to implement that interface:
-```
+``` c#
 public class SimpleClass : ISimpleClass
 {
     public void Print()
@@ -178,7 +178,7 @@ public class SimpleClass : ISimpleClass
 ```
 
 You must to say DI which class to instantiate for that interface:
-```
+``` c#
 public class MyDiContainer : DiContainer
 {
 
@@ -191,7 +191,7 @@ public class MyDiContainer : DiContainer
 Definition for AddByType is `AddByType<For all required interface, Provde class>`
 
 And you can use it:
-```
+``` c#
 public class GameManager : MonoBehaviour
 {
     [Inject]
@@ -212,7 +212,7 @@ public class GameManager : MonoBehaviour
 #### You can also combine classification by name with interfaces to achive more complex solution
 
 Let create one more extension for `ISimpleClass`:
-```
+``` c#
 public class NotSoSimpleClass : ISimpleClass
 {
     public void Print()
@@ -223,7 +223,7 @@ public class NotSoSimpleClass : ISimpleClass
 ```
 
 Now we can separate it by classification:
-```
+``` c#
 public class MyDiContainer : DiContainer
 {
 
@@ -236,7 +236,7 @@ public class MyDiContainer : DiContainer
 ```
 
 And use it:
-```
+``` c#
 public class GameManager : MonoBehaviour
 {
     [Inject("simple")]
@@ -259,7 +259,7 @@ public class GameManager : MonoBehaviour
 ```
 ### 4. Add by type as singleton
 Let create new class which will be used as singleton:
-```
+``` c#
 public class SingletonSample
 {
     public void Hello()
@@ -271,7 +271,7 @@ public class SingletonSample
 ```
 
 To use it like singleton, you can just inject it:
-```
+``` c#
 [Inject]
 public SingletonSample singleton;
 ```
@@ -280,7 +280,7 @@ public SingletonSample singleton;
 There is option to provide mono classes from instance.
 
 Create one mono class:
-```
+``` c#
 public class UiExample : MonoBehaviour
 {
     public void Hello()
@@ -291,7 +291,7 @@ public class UiExample : MonoBehaviour
 ```
 
 Than provide it to the DI container:
-```
+``` c#
 public class MyDiContainer : DiContainer
 {
 
@@ -304,7 +304,7 @@ public class MyDiContainer : DiContainer
 }
 ```
 And use it in your class:
-```
+``` c#
 public class GameManager : MonoBehaviour
 {
     [Inject]
